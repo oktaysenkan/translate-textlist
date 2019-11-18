@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Translate
@@ -14,9 +17,26 @@ namespace Translate
     {
         static void Main(string[] args)
         {
-            ReadTxtFile("list.txt");
-            //TranslatedWord translatedWord = Request("administration");
-            //Console.WriteLine(translatedWord.English + " => " +  string.Join(", ", translatedWord.Turkish));
+            List<string> words = ReadTxtFile("list.txt");
+            List<TranslatedWord> translatedWords = new List<TranslatedWord>();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < words.Count; i++)
+            {
+                TranslatedWord translatedWord = Request(words[i]);
+                Console.WriteLine(translatedWord.English + " => " + translatedWord.Turkish);
+                translatedWords.Add(translatedWord);
+                Thread.Sleep(100);
+            }
+
+            string output = JsonConvert.SerializeObject(translatedWords);
+            Console.WriteLine("Done.");
+
+            using (StreamWriter file = new StreamWriter("word.json"))
+            {
+                file.WriteLine(output);
+            }
+
             Console.ReadLine();
         }
 
@@ -26,9 +46,7 @@ namespace Translate
             string[] lines = File.ReadAllLines(filePath);
 
             foreach (string line in lines)
-            {
                 words.Add(line);
-            }
 
             return words;
         }
@@ -48,7 +66,7 @@ namespace Translate
             TranslatedWord word = new TranslatedWord
             {
                 English = textToConvert,
-                Turkish = responseData.Text
+                Turkish = responseData.Text[0]
             };
 
             return word;

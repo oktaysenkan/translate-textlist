@@ -9,6 +9,6 @@ namespace Translate
     class TranslatedWord
     {
         public string English { get; set; }
-        public List<string> Turkish { get; set; }
+        public string Turkish { get; set; }
     }
 }
