@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,9 +14,23 @@ namespace Translate
     {
         static void Main(string[] args)
         {
-            TranslatedWord translatedWord = Request("administration");
-            Console.WriteLine(translatedWord.English + " => " +  string.Join(", ", translatedWord.Turkish));
+            ReadTxtFile("list.txt");
+            //TranslatedWord translatedWord = Request("administration");
+            //Console.WriteLine(translatedWord.English + " => " +  string.Join(", ", translatedWord.Turkish));
             Console.ReadLine();
+        }
+
+        public static List<string> ReadTxtFile(string filePath)
+        {
+            List<string> words = new List<string>();
+            string[] lines = File.ReadAllLines(filePath);
+
+            foreach (string line in lines)
+            {
+                words.Add(line);
+            }
+
+            return words;
         }
 
         public static TranslatedWord Request(string textToConvert)
@@ -30,7 +45,6 @@ namespace Translate
             var response = client.Post(request);
             var content = response.Content;
             ResponseData responseData = JsonConvert.DeserializeObject<ResponseData>(content);
-            //var response = client.Post<ResponseData>(request);
             TranslatedWord word = new TranslatedWord
             {
                 English = textToConvert,
