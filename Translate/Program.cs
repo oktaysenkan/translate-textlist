@@ -18,19 +18,19 @@ namespace Translate
         static void Main(string[] args)
         {
             List<string> words = ReadTxtFile("list.txt");
+            Console.WriteLine($"Loaded {words.Count} words.");
             List<TranslatedWord> translatedWords = new List<TranslatedWord>();
-            StringBuilder stringBuilder = new StringBuilder();
 
             for (int i = 0; i < words.Count; i++)
             {
-                TranslatedWord translatedWord = Request(words[i]);
-                Console.WriteLine(translatedWord.English + " => " + translatedWord.Turkish);
+                TranslatedWord translatedWord = Translate(words[i]);
+                Console.WriteLine($"[{i + 1}/{words.Count}] {translatedWord.English} => {translatedWord.Turkish}");
                 translatedWords.Add(translatedWord);
                 Thread.Sleep(100);
             }
 
             string output = JsonConvert.SerializeObject(translatedWords);
-            Console.WriteLine("Done.");
+            Console.WriteLine("All words translated.");
 
             using (StreamWriter file = new StreamWriter("word.json"))
             {
@@ -51,7 +51,7 @@ namespace Translate
             return words;
         }
 
-        public static TranslatedWord Request(string textToConvert)
+        public static TranslatedWord Translate(string textToConvert)
         {
             var client = new RestClient("https://translate.yandex.net/api/v1.5/tr.json");
             var request = new RestRequest("/translate");
